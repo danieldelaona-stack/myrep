@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Click Architecture · Daniel Gaona — Landing Page &amp; CRO</title>
+  <meta name="description" content="Daniel Gaona — Creative Systems Architect. AI-accelerated landing page production, CRO, and DTC wellness funnels." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --bg:            #000000;
+      --surface:       #0d0d0d;
+      --surface-up:    #141414;
+      --border:        rgba(255,255,255,0.08);
+      --border-mid:    rgba(255,255,255,0.14);
+      --border-strong: rgba(255,255,255,0.22);
+      --accent:        #00e87a;
+      --accent-dim:    rgba(0,232,122,0.12);
+      --accent-glow:   rgba(0,232,122,0.06);
+      --text:          #ffffff;
+      --text-2:        rgba(255,255,255,0.72); /* 9:1 on #000 — WCAG AA ✓ */
+      --text-3:        rgba(255,255,255,0.55); /* 6.5:1 on #000 — WCAG AA ✓ */
+      --mono:          'Courier New', Courier, monospace;
+      --sans:          'Inter', system-ui, -apple-system, sans-serif;
+      --r-sm:          6px;
+      --r-pill:        9999px;
+      --container:     1120px;
+      --gutter:        clamp(20px, 5vw, 64px);
+      --section-gap:   clamp(56px, 8vw, 100px);
+    }
+
+    /* ═══════════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════
+       ACCESSIBILITY — SKIP LINK & FOCUS
+    ═══════════════════════════════════════════ */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 16px;
+      z-index: 9999;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 16px;
+      border-radius: var(--r-pill);
+      text-decoration: none;
+      transition: top .15s;
+    }
+    .skip-link:focus { top: 16px; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT HELPERS
+    ═══════════════════════════════════════════ */
+    .wrap {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+    }
+
+    .section {
+      padding-block: var(--section-gap);
+      border-top: 1px solid var(--border);
+    }
+
+    .section:first-of-type { border-top: none; }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 900;
+      letter-spacing: -.025em;
+      line-height: 1.05;
+    }
+
+    /* ═══════════════════════════════════════════
+       TOP BAR
+    ═══════════════════════════════════════════ */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-mid);
+      padding-block: 12px;
+    }
+
+    .top-bar__inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Identity — left */
+    .top-bar__identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .top-bar__name {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .top-bar__sep {
+      color: var(--border-strong);
+      font-weight: 300;
+      font-size: 16px;
+    }
+
+    .top-bar__role {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: .1em;
+      color: var(--accent);      /* verde — 11:1 ✓, mucho más legible */
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Actions — right */
+    .top-bar__actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .top-bar__contact {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .06em;
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .top-bar__contact:hover { color: #fff; }
+
+    .top-bar__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #000;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      padding: 8px 18px;
+      border-radius: var(--r-pill);
+      text-decoration: none;
+      transition: opacity .15s, transform .1s;
+      white-space: nowrap;
+    }
+
+    .top-bar__cta:hover  { opacity: .88; transform: translateY(-1px); }
+    .top-bar__cta:active { transform: translateY(0); }
+
+    .top-bar__cta:hover  { opacity: .88; transform: translateY(-1px); }
+    .top-bar__cta:active { transform: translateY(0); }
+
+    .top-bar__cta:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 640px) {
+      .top-bar__contact { display: none; }
+      .top-bar__sep, .top-bar__role { display: none; }
+    }
+
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    .hero {
+      padding-block: clamp(64px, 10vw, 120px) clamp(48px, 6vw, 72px);
+    }
+
+    .hero__inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: end;
+    }
+
+    .hero__headline {
+      font-size: clamp(32px, 5.5vw, 68px);
+      font-weight: 900;
+      letter-spacing: -.035em;
+      line-height: 1.0;
+    }
+
+    .hero__headline em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero__sub {
+      margin-top: 24px;
+      font-size: clamp(13px, 1.4vw, 15px);
+      color: var(--text-2);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    .hero__meta {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .hero__role {
+      font-size: 11px;
+      color: var(--text-3);
+      letter-spacing: .05em;
+      margin-bottom: 4px;
+    }
+
+    .hero__target {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--accent);
+    }
+
+    .hero__position {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════
+       MARQUEE
+    ═══════════════════════════════════════════ */
+    .marquee-strip {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding-block: 14px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      width: max-content;
+      animation: marquee 28s linear infinite;
+    }
+
+    .marquee-track:hover { animation-play-state: paused; }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track { animation: none; }
+    }
+
+    .marquee-item {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.62); /* ~7:1 contrast on #000 — WCAG AA ✓ */
+      padding-inline: 28px;
+      white-space: nowrap;
+    }
+
+    .marquee-item + .marquee-item::before {
+      content: '/';        /* character + position conveys separation, not color alone */
+      margin-right: 28px;
+      color: var(--accent);
+    }
+
+    /* ═══════════════════════════════════════════
+       VALUE PROPOSITION
+    ═══════════════════════════════════════════ */
+    .value-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(32px, 5vw, 72px);
+      align-items: start;
+    }
+
+    .value-headline {
+      font-size: clamp(24px, 3vw, 38px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+    }
+
+    .value-headline .a { color: var(--accent); }
+
+    .value-body {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.75;
+      max-width: 480px;
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      padding: clamp(20px, 3vw, 32px);
+      transition: background .2s;
+    }
+
+    .kpi-card:hover { background: var(--surface-up); }
+
+    .kpi-number {
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 8px;
+      line-height: 1.5;
+      letter-spacing: .03em;
+    }
+
+    /* System Banner */
+    .system-banner {
+      margin-top: clamp(32px, 5vw, 52px);
+      padding: 18px 28px;
+      border: 1px solid var(--accent);
+      background: var(--accent-glow);
+      border-radius: var(--r-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .system-banner__title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .system-banner__desc {
+      font-size: 13px;
+      color: var(--text-2);
+    }
+
+    /* ═══════════════════════════════════════════
+       THREE COLUMNS: LOOP / ENGINE / OUTPUTS
+    ═══════════════════════════════════════════ */
+    .engine-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+    }
+
+    .engine-col {
+      padding: clamp(28px, 4vw, 44px);
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .engine-col:last-child { border-right: none; }
+
+    .engine-col__title {
+      font-size: clamp(22px, 2.5vw, 30px);
+      font-weight: 900;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+
+    .engine-col__title .a { color: var(--accent); }
+
+    /* Loop steps */
+    .loop-step {
+      display: flex;
+      gap: 14px;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .loop-step:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: .1em;
+      padding-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      margin-bottom: 4px;
+    }
+
+    .step-body {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* If→Then */
+    .if-then-item { margin-bottom: 20px; }
+    .if-then-item:last-child { margin-bottom: 0; }
+
+    .if-line {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .then-line {
+      font-size: 13px;
+      color: var(--text-2);
+      padding-left: 16px;
+      border-left: 2px solid var(--accent-dim);
+      line-height: 1.6;
+    }
+
+    /* Outputs */
+    .output-item {
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .output-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .output-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: .04em;
+      margin-bottom: 4px;
+    }
+
+    .output-body { font-size: 12px; color: var(--text-2); line-height: 1.65; }
+
+    /* ═══════════════════════════════════════════
+       ACCORDION — 5 PILLARS
+    ═══════════════════════════════════════════ */
+    .accordion {
+      border-top: 1px solid var(--border-mid);
+    }
+
+    .accordion__item {
+      border-bottom: 1px solid var(--border-mid);
+    }
+
+    .accordion__trigger {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 88px 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 28px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      text-align: left;
+      transition: opacity .15s;
+    }
+
+    .accordion__trigger:hover { opacity: .8; }
+
+    .accordion__trigger:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
+
+    .accordion__num {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--accent);
+      font-family: var(--sans);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+
+    .accordion__item.is-open .accordion__num {
+      transform: translateX(6px);
+    }
+
+    .accordion__title {
+      font-size: clamp(18px, 2.5vw, 26px);
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.15;
+    }
+
+    .accordion__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .2s, border-color .2s, transform .35s cubic-bezier(.4,0,.2,1);
+      position: relative;
+    }
+
+    .accordion__icon::before,
+    .accordion__icon::after {
+      content: '';
+      position: absolute;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .2s;
+    }
+
+    /* horizontal bar */
+    .accordion__icon::before {
+      width: 14px; height: 1.5px;
+    }
+
+    /* vertical bar */
+    .accordion__icon::after {
+      width: 1.5px; height: 14px;
+    }
+
+    .accordion__item.is-open .accordion__icon {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: rotate(45deg);
+    }
+
+    .accordion__item.is-open .accordion__icon::before,
+    .accordion__item.is-open .accordion__icon::after {
+      background: #000;
+    }
+
+    /* Smooth height with grid trick */
+    .accordion__body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .4s cubic-bezier(.4,0,.2,1);
+    }
+
+    .accordion__item.is-open .accordion__body {
+      grid-template-rows: 1fr;
+    }
+
+    .accordion__body-inner {
+      overflow: hidden;
+    }
+
+    .accordion__body-content {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 24px;
+      padding-bottom: 36px;
+    }
+
+    .accordion__body-content p {
+      grid-column: 2;
+      font-size: 15px;
+      color: var(--text-2);
+      line-height: 1.8;
+      max-width: 600px;
+    }
+
+    /* Accent left bar when open */
+    .accordion__item {
+      position: relative;
+    }
+
+    .accordion__item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform .4s cubic-bezier(.4,0,.2,1);
+    }
+
+    .accordion__item.is-open::before {
+      transform: scaleY(1);
+    }
+
+    /* ═══════════════════════════════════════════
+       CULTURAL SEGMENTATION
+    ═══════════════════════════════════════════ */
+    .culture-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: clamp(40px, 6vw, 80px);
+      align-items: start;
+    }
+
+    .culture-intro__title {
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .culture-intro__title .a { color: var(--accent); }
+
+    .culture-intro__body {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.75;
+    }
+
+    .culture-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+    }
+
+    .culture-card {
+      background: var(--surface);
+      padding: 22px 20px;
+      transition: background .2s;
+    }
+
+    .culture-card:hover { background: var(--surface-up); }
+
+    .culture-card__name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .culture-card__desc {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════
+       ROADMAP
+    ═══════════════════════════════════════════ */
+    .roadmap-headline {
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      margin-bottom: clamp(32px, 5vw, 52px);
+    }
+
+    .roadmap-headline .a { color: var(--accent); }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    /* Connector line */
+    .roadmap-grid::before {
+      content: '';
+      position: absolute;
+      top: 11px;
+      left: calc(12px + 1px);
+      right: calc(12px + 1px);
+      height: 1px;
+      background: linear-gradient(to right, var(--accent), rgba(0,232,122,.3));
+      pointer-events: none;
+    }
+
+    .roadmap-col {
+      padding: 0 12px;
+      border-right: none;
+    }
+
+    .roadmap-col:first-child { padding-left: 0; }
+    .roadmap-col:last-child  { padding-right: 0; }
+
+    .roadmap-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .roadmap-dot::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .roadmap-period {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent); /* 11:1 — ✓ */
+      letter-spacing: .14em;
+      margin-bottom: 6px;
+    }
+
+    .roadmap-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      margin-bottom: 14px;
+    }
+
+    .roadmap-items {
+      list-style: none;
+    }
+
+    .roadmap-items li {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.6;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 5px;
+    }
+
+    .roadmap-items li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════ */
+    @media (prefers-reduced-motion: no-preference) {
+      [data-reveal] {
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity  .65s cubic-bezier(.4,0,.2,1),
+          transform .65s cubic-bezier(.4,0,.2,1);
+        transition-delay: var(--reveal-delay, 0ms);
+      }
+
+      [data-reveal="left"] {
+        transform: translateX(-24px);
+      }
+
+      [data-reveal="scale"] {
+        transform: scale(.96);
+      }
+
+      [data-reveal].is-revealed {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       WHY DIFFERENT
+    ═══════════════════════════════════════════ */
+    .why-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 80px);
+      align-items: start;
+    }
+
+    .why-headline {
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+
+    .why-sub {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    .why-list { list-style: none; }
+
+    .why-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding-block: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .why-item:first-child { border-top: 1px solid var(--border); }
+
+    .why-icon {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .why-item__text {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    .why-item__text strong {
+      color: var(--text);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    /* Compliance badges */
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+      color: #ffffff;             /* 21:1 — WCAG AAA ✓ */
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════
+       CLOSING + CANDIDATE
+    ═══════════════════════════════════════════ */
+    .closing {
+      padding-block: var(--section-gap) clamp(64px, 10vw, 120px);
+      border-top: 1px solid var(--border);
+    }
+
+    .closing__grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: clamp(48px, 7vw, 96px);
+      align-items: end;
+    }
+
+    .closing__headline {
+      font-size: clamp(30px, 5vw, 60px);
+      font-weight: 900;
+      letter-spacing: -.035em;
+      line-height: 1.05;
+    }
+
+    .closing__headline .a { color: var(--accent); }
+
+    .closing__body {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.75;
+      max-width: 520px;
+    }
+
+    .candidate {
+      min-width: 220px;
+      text-align: right;
+    }
+
+    .candidate__name {
+      font-size: clamp(26px, 3vw, 36px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      margin-bottom: 6px;
+    }
+
+    .candidate__role {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: 2px;
+    }
+
+    .candidate__sub {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    address { font-style: normal; }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 7px;
+    }
+
+    .contact-link {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: .06em;
+      transition: opacity .15s;
+    }
+
+    .contact-link:hover { opacity: .75; }
+
+    .contact-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    .contact-phone {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-3); /* updated token = 6.5:1 — ✓ */
+      letter-spacing: .06em;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .hero__inner       { grid-template-columns: 1fr; }
+      .hero__meta        { text-align: left; }
+      .value-grid        { grid-template-columns: 1fr; }
+      .engine-grid       { grid-template-columns: 1fr; }
+      .engine-col        { border-right: none; border-bottom: 1px solid var(--border); }
+      .engine-col:last-child { border-bottom: none; }
+      .culture-layout    { grid-template-columns: 1fr; }
+      .why-layout        { grid-template-columns: 1fr; }
+      .closing__grid     { grid-template-columns: 1fr; }
+      .candidate         { text-align: left; }
+      .contact-list      { align-items: flex-start; }
+      .roadmap-grid::before { display: none; }
+      .accordion__trigger { grid-template-columns: 60px 1fr auto; }
+      .accordion__body-content { grid-template-columns: 60px 1fr; }
+      .accordion__num { font-size: 36px; }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid          { grid-template-columns: 1fr 1fr; }
+      .culture-grid      { grid-template-columns: 1fr 1fr; }
+      .roadmap-grid      { grid-template-columns: 1fr 1fr; }
+      .accordion__trigger { grid-template-columns: 48px 1fr auto; gap: 16px; }
+      .accordion__body-content { grid-template-columns: 48px 1fr; gap: 16px; }
+      .accordion__num { font-size: 28px; }
+      .accordion__title { font-size: 16px; }
+    }
+
+    @media (max-width: 420px) {
+      .culture-grid { grid-template-columns: 1fr; }
+      .roadmap-grid { grid-template-columns: 1fr; }
+      .kpi-grid     { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- SKIP LINK -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <div class="wrap top-bar__inner">
+      <div class="top-bar__identity">
+        <span class="top-bar__name">Daniel Gaona</span>
+        <span class="top-bar__sep" aria-hidden="true">—</span>
+        <span class="top-bar__role">Creative Systems Architect · Landing Page &amp; CRO</span>
+      </div>
+      <div class="top-bar__actions">
+        <a class="top-bar__contact" href="tel:+573184246635" aria-label="Call Daniel Gaona">+57 318 424 6635</a>
+        <a class="top-bar__cta" href="mailto:danieldelaona@gmail.com" aria-label="Send email to Daniel Gaona">
+          Contact me ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ─── HERO ─── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <div class="hero__inner">
+          <div>
+            <span class="eyebrow">// Post-Click Architecture</span>
+            <h1 class="hero__headline" id="hero-title">
+              I design systems where<br>
+              <em>AI accelerates</em> high-converting<br>
+              landing page production.
+            </h1>
+            <p class="hero__sub">
+              Without compromising performance. Every click your brand buys deserves
+              a post-click experience built for conversion — fast, data-driven,
+              and culturally precise.
+            </p>
+          </div>
+          <div class="hero__meta" aria-label="Target company and role">
+            <p class="hero__role">APPLYING FOR</p>
+            <p class="hero__target" aria-label="CRO">CRO</p>
+            <p class="hero__position">Landing Page Designer<br>Conversion Focused</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MARQUEE ─── -->
+    <div
+      class="marquee-strip"
+      role="region"
+      aria-label="Industries served: Cannabis, Hemp, CBD, Psychedelics, Adaptogens, DTC Wellness, Restricted Categories"
+    >
+      <div class="marquee-track" aria-hidden="true">
+        <span class="marquee-item">Cannabis</span>
+        <span class="marquee-item">Hemp</span>
+        <span class="marquee-item">CBD</span>
+        <span class="marquee-item">Psychedelics</span>
+        <span class="marquee-item">Adaptogens</span>
+        <span class="marquee-item">Conscious Compounds</span>
+        <span class="marquee-item">DTC Wellness</span>
+        <span class="marquee-item">Restricted Categories</span>
+        <span class="marquee-item">Performance Creative</span>
+        <span class="marquee-item">Post-Click Architecture</span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee-item">Cannabis</span>
+        <span class="marquee-item">Hemp</span>
+        <span class="marquee-item">CBD</span>
+        <span class="marquee-item">Psychedelics</span>
+        <span class="marquee-item">Adaptogens</span>
+        <span class="marquee-item">Conscious Compounds</span>
+        <span class="marquee-item">DTC Wellness</span>
+        <span class="marquee-item">Restricted Categories</span>
+        <span class="marquee-item">Performance Creative</span>
+        <span class="marquee-item">Post-Click Architecture</span>
+      </div>
+    </div>
+
+    <!-- ─── VALUE PROPOSITION ─── -->
+    <section class="section" aria-labelledby="value-title">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>// Value Proposition</span>
+        <div class="value-grid">
+          <div>
+            <h2 class="value-headline" id="value-title" data-reveal data-reveal-delay="80">
+              I don't just design pages.<br>
+              <span class="a">I build the system</span><br>
+              that makes them convert.
+            </h2>
+            <p class="value-body">
+              Performance brands operate at the intersection of culture and conversion. Every click
+              that survives platform moderation is expensive. My system ensures that click
+              is never wasted — post-click pages speak the exact language of the ad,
+              the buyer, and the culture driving them to act. Built fast with AI.
+              Governed by performance data.
+            </p>
+          </div>
+
+          <div>
+            <ul class="kpi-grid" aria-label="Key performance indicators" style="list-style:none;">
+              <li class="kpi-card" data-reveal data-reveal-delay="0">
+                <p class="kpi-number" aria-label="3 or more">3+</p>
+                <p class="kpi-label">YRS — DTC funnel &amp; eComm design</p>
+              </li>
+              <li class="kpi-card" data-reveal data-reveal-delay="100">
+                <p class="kpi-number" aria-label="20 or more">20+</p>
+                <p class="kpi-label">LPs — wellness &amp; DTC portfolio</p>
+              </li>
+              <li class="kpi-card" data-reveal data-reveal-delay="200">
+                <p class="kpi-number" aria-label="4x output">×4</p>
+                <p class="kpi-label">OUTPUT — AI-accelerated production</p>
+              </li>
+              <li class="kpi-card" data-reveal data-reveal-delay="300">
+                <p class="kpi-number" style="font-size: clamp(22px,2.5vw,30px); padding-top: 6px;" aria-label="All in one">ALL&nbsp;IN<br>ONE</p>
+                <p class="kpi-label">CVR · ROAS · CAC · Hook · CX</p>
+              </li>
+            </ul>
+
+            <div class="system-banner" role="note" aria-label="System description">
+              <span class="system-banner__title">Performance Post-Click System</span>
+              <span class="system-banner__desc">Campaign measurement + hyper-personalized pages by culture — one connected loop</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MEASUREMENT ENGINE ─── -->
+    <section class="section" aria-labelledby="engine-title">
+      <div class="wrap">
+        <span class="eyebrow">// The System</span>
+        <h2 class="section-title" id="engine-title" style="margin-bottom: clamp(24px, 4vw, 40px);">
+          Four inputs.<br>One loop. Zero wasted clicks.
+        </h2>
+        <div class="engine-grid">
+
+          <!-- Column 1: Measurement Loop -->
+          <div class="engine-col" aria-labelledby="loop-heading" data-reveal data-reveal-delay="0">
+            <span class="eyebrow">// The Measurement Loop</span>
+            <h3 class="engine-col__title" id="loop-heading">4 Steps.<br><span class="a">One Loop.</span></h3>
+            <ol class="loop-steps" role="list" style="list-style:none;">
+              <li class="loop-step">
+                <span class="step-num" aria-hidden="true">01</span>
+                <div>
+                  <p class="step-title">Hook Audit</p>
+                  <p class="step-body">Hook rate + CTR from the ad. If the hook doesn't hold, no page will save the conversion.</p>
+                </div>
+              </li>
+              <li class="loop-step">
+                <span class="step-num" aria-hidden="true">02</span>
+                <div>
+                  <p class="step-title">AdPage Match</p>
+                  <p class="step-body">The ad's promise continues on the LP — headline, offer, tone. I score friction per variant.</p>
+                </div>
+              </li>
+              <li class="loop-step">
+                <span class="step-num" aria-hidden="true">03</span>
+                <div>
+                  <p class="step-title">On-Page Signals</p>
+                  <p class="step-body">Scroll depth, time-on-page, add-to-cart, exit intent. Each signal maps to a specific friction point.</p>
+                </div>
+              </li>
+              <li class="loop-step">
+                <span class="step-num" aria-hidden="true">04</span>
+                <div>
+                  <p class="step-title">Iterate Fast</p>
+                  <p class="step-body">Data triggers the next variant. CVR, ROAS and CAC measured in parallel. Loop closes in 48–72 hrs.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Column 2: Hyper-Personalization Engine -->
+          <div class="engine-col" aria-labelledby="ifthen-heading" data-reveal data-reveal-delay="140">
+            <span class="eyebrow">// Hyper-Personalization Engine</span>
+            <h3 class="engine-col__title" id="ifthen-heading">If Ad.<br><span class="a">Then Page.</span></h3>
+            <ul role="list" style="list-style:none;">
+              <li class="if-then-item">
+                <p class="if-line">IF AD: Wellness / Calm</p>
+                <p class="then-line">LP: Soft language, natural imagery, science-light copy. Trust over claims.</p>
+              </li>
+              <li class="if-then-item">
+                <p class="if-line">IF AD: Energy / Optimize</p>
+                <p class="then-line">LP: Clinical tone, data-driven framing, biohacker visual system.</p>
+              </li>
+              <li class="if-then-item">
+                <p class="if-line">IF AD: Recovery / Sport</p>
+                <p class="then-line">LP: Athletic framing, speed-of-recovery claims, social proof stack.</p>
+              </li>
+              <li class="if-then-item">
+                <p class="if-line">IF AD: LATAM / Cultural</p>
+                <p class="then-line">LP: Spanish-native copy, ancestral roots + science validation narrative.</p>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Column 3: System Outputs -->
+          <div class="engine-col" aria-labelledby="outputs-heading" data-reveal data-reveal-delay="280">
+            <span class="eyebrow">// System Outputs</span>
+            <h3 class="engine-col__title" id="outputs-heading">What this<br><span class="a">produces.</span></h3>
+            <ul role="list" style="list-style:none;">
+              <li class="output-item">
+                <p class="output-title">CVR by Segment</p>
+                <p class="output-body">Not an average. Conversion rates by buyer archetype, ad hook, and geography.</p>
+              </li>
+              <li class="output-item">
+                <p class="output-title">Friction Map</p>
+                <p class="output-body">A visual map of exactly where the page is losing the buyer — and why.</p>
+              </li>
+              <li class="output-item">
+                <p class="output-title">LP Variant Library</p>
+                <p class="output-body">Same product, 4–6 active cultural narratives ready to deploy on demand.</p>
+              </li>
+              <li class="output-item">
+                <p class="output-title">Ad-to-Page Score</p>
+                <p class="output-body">Proprietary metric: how aligned is the ad with the page. Below 7/10 — we iterate.</p>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 5 PILLARS — ACCORDION ─── -->
+    <section class="section" aria-labelledby="pillars-title">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>// Creative Architecture System — 5 Pillars</span>
+        <h2 class="section-title" id="pillars-title" style="margin-bottom: clamp(32px,5vw,56px);" data-reveal data-reveal-delay="80">
+          The architecture behind<br>every page I build.
+        </h2>
+
+        <div class="accordion" role="list">
+
+          <div class="accordion__item" role="listitem" data-reveal data-reveal-delay="100">
+            <button class="accordion__trigger" aria-expanded="false" aria-controls="p1-body" id="p1-btn">
+              <span class="accordion__num" aria-hidden="true">01</span>
+              <span class="accordion__title">Ad-to-Page Continuity</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </button>
+            <div class="accordion__body" id="p1-body" role="region" aria-labelledby="p1-btn">
+              <div class="accordion__body-inner">
+                <div class="accordion__body-content">
+                  <p>The ad's hook, offer and tone continue unbroken on the LP. No cognitive gap. No lost momentum. Every pixel exists to honor the promise the ad made.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion__item" role="listitem" data-reveal data-reveal-delay="180">
+            <button class="accordion__trigger" aria-expanded="false" aria-controls="p2-body" id="p2-btn">
+              <span class="accordion__num" aria-hidden="true">02</span>
+              <span class="accordion__title">Cultural Segmentation</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </button>
+            <div class="accordion__body" id="p2-body" role="region" aria-labelledby="p2-btn">
+              <div class="accordion__body-inner">
+                <div class="accordion__body-content">
+                  <p>Distinct copy + visual system per buyer archetype. Same product — radically different narrative. The biohacker and the holistic seeker don't speak the same language. Neither do our pages.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion__item" role="listitem" data-reveal data-reveal-delay="260">
+            <button class="accordion__trigger" aria-expanded="false" aria-controls="p3-body" id="p3-btn">
+              <span class="accordion__num" aria-hidden="true">03</span>
+              <span class="accordion__title">Compliance Design Logic</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </button>
+            <div class="accordion__body" id="p3-body" role="region" aria-labelledby="p3-btn">
+              <div class="accordion__body-inner">
+                <div class="accordion__body-content">
+                  <p>Pages that say CBD, Ketamine, Psychedelic — and pass Meta/TikTok policy. No hiding. No pretending. Compliance built into the design logic, not bolted on after.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion__item" role="listitem" data-reveal data-reveal-delay="340">
+            <button class="accordion__trigger" aria-expanded="false" aria-controls="p4-body" id="p4-btn">
+              <span class="accordion__num" aria-hidden="true">04</span>
+              <span class="accordion__title">AI-Accelerated Production</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </button>
+            <div class="accordion__body" id="p4-body" role="region" aria-labelledby="p4-btn">
+              <div class="accordion__body-inner">
+                <div class="accordion__body-content">
+                  <p>First draft in hours, not days. Machine speed with editorial judgment. 4× output, same quality bar. AI handles the velocity — I handle the judgment.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion__item" role="listitem" data-reveal data-reveal-delay="420">
+            <button class="accordion__trigger" aria-expanded="false" aria-controls="p5-body" id="p5-btn">
+              <span class="accordion__num" aria-hidden="true">05</span>
+              <span class="accordion__title">Test &amp; Learn Loop</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </button>
+            <div class="accordion__body" id="p5-body" role="region" aria-labelledby="p5-btn">
+              <div class="accordion__body-inner">
+                <div class="accordion__body-content">
+                  <p>Every page launches with a testable hypothesis. The loop closes in 48–72 hrs. Pages get smarter. Data replaces intuition. Each iteration is cheaper and faster than the last.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── CULTURAL SEGMENTATION ─── -->
+    <section class="section" aria-labelledby="culture-title">
+      <div class="wrap">
+        <span class="eyebrow">// Cultural Segmentation</span>
+        <div class="culture-layout">
+          <div>
+            <h2 class="culture-intro__title" id="culture-title">
+              Pages that speak<br>
+              <span class="a">their language.</span>
+            </h2>
+            <p class="culture-intro__body">
+              Same base design. Dynamic copy and visual system activated by the ad source,
+              geography, and the cultural intent of each buyer archetype.
+            </p>
+          </div>
+          <ul class="culture-grid" aria-label="Buyer archetypes" style="list-style:none;">
+            <li class="culture-card" aria-labelledby="c1-name" data-reveal data-reveal-delay="0">
+              <p class="culture-card__name" id="c1-name">Wellness Conscious</p>
+              <p class="culture-card__desc">Clean ingredients, calm mind, balanced body.</p>
+            </li>
+            <li class="culture-card" aria-labelledby="c2-name" data-reveal data-reveal-delay="80">
+              <p class="culture-card__name" id="c2-name">Biohacker</p>
+              <p class="culture-card__desc">Protocols. Data. Peak performance. No compromise.</p>
+            </li>
+            <li class="culture-card" aria-labelledby="c3-name" data-reveal data-reveal-delay="160">
+              <p class="culture-card__name" id="c3-name">Urban CBD</p>
+              <p class="culture-card__desc">No drama. Works. Available everywhere.</p>
+            </li>
+            <li class="culture-card" aria-labelledby="c4-name" data-reveal data-reveal-delay="80">
+              <p class="culture-card__name" id="c4-name">Recovery Athlete</p>
+              <p class="culture-card__desc">Train hard. Recover faster. Repeat.</p>
+            </li>
+            <li class="culture-card" aria-labelledby="c5-name">
+              <p class="culture-card__name" id="c5-name">Holistic Seeker</p>
+              <p class="culture-card__desc">The plant as teacher. Earth as medicine.</p>
+            </li>
+            <li class="culture-card" aria-labelledby="c6-name">
+              <p class="culture-card__name" id="c6-name">LATAM Culture</p>
+              <p class="culture-card__desc">What grandmother knew. Validated by science.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── IMPACT ROADMAP ─── -->
+    <section class="section" aria-labelledby="roadmap-title">
+      <div class="wrap">
+        <span class="eyebrow">// Impact Roadmap</span>
+        <h2 class="roadmap-headline" id="roadmap-title">
+          First <span class="a">90 days.</span>
+        </h2>
+        <ol class="roadmap-grid" aria-label="90-day impact roadmap" role="list" style="list-style:none;">
+          <li class="roadmap-col" aria-labelledby="r1-title">
+            <div class="roadmap-dot" aria-hidden="true"></div>
+            <p class="roadmap-period">30D</p>
+            <h3 class="roadmap-title" id="r1-title">Audit &amp; Launch</h3>
+            <ul class="roadmap-items">
+              <li>Full post-click audit</li>
+              <li>First LPs live on accounts</li>
+              <li>Request process defined</li>
+            </ul>
+          </li>
+          <li class="roadmap-col" aria-labelledby="r2-title">
+            <div class="roadmap-dot" aria-hidden="true"></div>
+            <p class="roadmap-period">60D</p>
+            <h3 class="roadmap-title" id="r2-title">Align &amp; Own</h3>
+            <ul class="roadmap-items">
+              <li>Ad hooks → pages aligned</li>
+              <li>CVR patterns identified</li>
+              <li>Multi-account ownership</li>
+            </ul>
+          </li>
+          <li class="roadmap-col" aria-labelledby="r3-title">
+            <div class="roadmap-dot" aria-hidden="true"></div>
+            <p class="roadmap-period">90D</p>
+            <h3 class="roadmap-title" id="r3-title">System Owner</h3>
+            <ul class="roadmap-items">
+              <li>Clear internal LP owner</li>
+              <li>AI in full pipeline</li>
+              <li>Build → iterate → optimize</li>
+            </ul>
+          </li>
+          <li class="roadmap-col" aria-labelledby="r4-title">
+            <div class="roadmap-dot" aria-hidden="true"></div>
+            <p class="roadmap-period">1 YR</p>
+            <h3 class="roadmap-title" id="r4-title">Performance Lever</h3>
+            <ul class="roadmap-items">
+              <li>LPs in hours, not weeks</li>
+              <li>CVR lift = documented rev</li>
+              <li>Post-click = competitive edge</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ─── WHY DIFFERENT ─── -->
+    <section class="section" aria-labelledby="why-title">
+      <div class="wrap">
+        <span class="eyebrow">// Why I'm Different</span>
+        <div class="why-layout">
+          <div>
+            <h2 class="why-headline" id="why-title">More than<br>a designer.</h2>
+            <p class="why-sub">
+              Most designers build pages. I build systems that make pages perform —
+              with compliance intelligence, cultural precision, and data-driven iteration.
+            </p>
+            <ul class="badges" aria-label="Compliance standards" style="list-style:none;">
+              <li class="badge">Meta Ads Compliant</li>
+              <li class="badge">TikTok Restricted</li>
+              <li class="badge">Google CBD/Hemp</li>
+              <li class="badge">FTC Standards</li>
+              <li class="badge">DTC Wellness Copy</li>
+              <li class="badge">CRO-First Structure</li>
+              <li class="badge">Hook-Rate Tracking</li>
+              <li class="badge">Cultural Segmentation</li>
+            </ul>
+          </div>
+
+          <div>
+            <ul class="why-list" aria-label="Differentiators">
+              <li class="why-item">
+                <span class="why-icon" aria-hidden="true"></span>
+                <div class="why-item__text">
+                  <strong>Compliance-first design</strong>
+                  Pages that say CBD, Ketamine, Psychedelic — and pass Meta/TikTok policy without losing CVR.
+                </div>
+              </li>
+              <li class="why-item">
+                <span class="why-icon" aria-hidden="true"></span>
+                <div class="why-item__text">
+                  <strong>Funnel-native, not web-generic</strong>
+                  Every design decision exists to move the visitor toward conversion. I read the buyer intent from the ad.
+                </div>
+              </li>
+              <li class="why-item">
+                <span class="why-icon" aria-hidden="true"></span>
+                <div class="why-item__text">
+                  <strong>AI as leverage, not a crutch</strong>
+                  I use AI for speed. I apply editorial judgment for quality. 4× output, zero compromise on performance.
+                </div>
+              </li>
+              <li class="why-item">
+                <span class="why-icon" aria-hidden="true"></span>
+                <div class="why-item__text">
+                  <strong>A system, not improvisation</strong>
+                  I run a measurement loop and a cultural activation ruleset. Pages don't guess — they respond to data.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── CLOSING + CANDIDATE ─── -->
+  <footer>
+    <div class="closing wrap" aria-labelledby="closing-title">
+      <div class="closing__grid">
+        <div>
+          <span class="eyebrow">// Closing Statement</span>
+          <h2 class="closing__headline" id="closing-title">
+            Your brand already wins the click.<br>
+            <span class="a">I build what converts after it.</span>
+          </h2>
+          <p class="closing__body">
+            The post-click experience is the biggest underutilized lever in performance growth —
+            your words. I bring the system, the AI-accelerated production speed, and the cultural
+            intelligence to make every click you buy work harder than it ever has before.
+          </p>
+        </div>
+
+        <div class="candidate">
+          <span class="eyebrow" style="text-align:right; display:block;" data-reveal>// Candidate</span>
+          <p class="candidate__name" data-reveal data-reveal-delay="80">Daniel Gaona</p>
+          <p class="candidate__role">Creative Systems Architect</p>
+          <p class="candidate__sub">Landing Page · CRO · AI-Assisted<br>DTC Wellness &amp; Cannabis Funnels</p>
+          <address>
+            <ul class="contact-list" aria-label="Contact information">
+              <li>
+                <a class="contact-link" href="mailto:danieldelaona@gmail.com" aria-label="Email Daniel Gaona">
+                  danieldelaona@gmail.com
+                </a>
+              </li>
+              <li>
+                <span class="contact-phone">+57 318 424 6635</span>
+              </li>
+              <li>
+                <a
+                  class="contact-link"
+                  href="https://linkedin.com/in/daniel-m-gaona"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Daniel Gaona on LinkedIn (opens in new tab)"
+                >
+                  linkedin.com/in/daniel-m-gaona
+                </a>
+              </li>
+            </ul>
+          </address>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ─── SCROLL REVEAL ─── */
+    (function () {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      /* threshold:0 + rootMargin conservador — dispara en mobile tan pronto
+         cualquier pixel del elemento cruza el viewport */
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+
+      /* rAF garantiza que el layout ya terminó antes de observar */
+      requestAnimationFrame(function () {
+        document.querySelectorAll('[data-reveal]').forEach(function (el) {
+          var delay = el.dataset.revealDelay;
+          if (delay) el.style.setProperty('--reveal-delay', delay + 'ms');
+          observer.observe(el);
+        });
+      });
+    })();
+
+    /* ─── ACCORDION ─── */
+    (function () {
+      var items = document.querySelectorAll('.accordion__item');
+
+      items.forEach(function (item) {
+        var trigger = item.querySelector('.accordion__trigger');
+        var body    = item.querySelector('.accordion__body');
+
+        trigger.addEventListener('click', function () {
+          var isOpen = item.classList.contains('is-open');
+
+          /* Close all */
+          items.forEach(function (i) {
+            i.classList.remove('is-open');
+            i.querySelector('.accordion__trigger').setAttribute('aria-expanded', 'false');
+          });
+
+          /* Toggle clicked */
+          if (!isOpen) {
+            item.classList.add('is-open');
+            trigger.setAttribute('aria-expanded', 'true');
+          }
+        });
+
+        /* Keyboard: open with Enter/Space (handled natively by button) */
+      });
+    })();
+  </script>
+
+</body>
+</html>
